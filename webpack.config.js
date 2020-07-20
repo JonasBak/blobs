@@ -4,7 +4,7 @@ const webpack = require("webpack");
 const WasmPackPlugin = require("@wasm-tool/wasm-pack-plugin");
 
 module.exports = {
-  entry: "./www/script.js",
+  entry: "./www/index.js",
   output: {
     path: path.resolve(__dirname, "dist"),
     filename: "index.js",
@@ -23,5 +23,13 @@ module.exports = {
       TextEncoder: ["text-encoding", "TextEncoder"],
     }),
   ],
+  module: {
+    rules: [
+      {
+        test: /\.(png|svg|jpg|gif)$/,
+        use: ["file-loader"],
+      },
+    ],
+  },
   mode: "development",
 };
