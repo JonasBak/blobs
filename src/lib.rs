@@ -29,16 +29,26 @@ pub fn apply_filter(ctx: &web_sys::CanvasRenderingContext2d) {
         .unwrap()
         .into();
 
-    LAPLACIAN2.apply(
-        &mut pixels,
-        |pixel: Pixel| (pixel[0] as i64 + pixel[1] as i64 + pixel[2] as i64) / 3,
-        |pixel: &mut Pixel, v: i64| {
-            let v = v.max(0).min(255) as u8;
-            pixel[0] = v;
-            pixel[1] = v;
-            pixel[2] = v;
-        },
-    );
+    Kernel3x3Filter {
+        k: LAPLACIAN2,
+        m: red_pixel_mapping,
+        r: red_apply_to_pixel,
+    }
+    .apply(&mut pixels);
+
+    Kernel3x3Filter {
+        k: LAPLACIAN2,
+        m: green_pixel_mapping,
+        r: green_apply_to_pixel,
+    }
+    .apply(&mut pixels);
+
+    Kernel3x3Filter {
+        k: LAPLACIAN2,
+        m: blue_pixel_mapping,
+        r: blue_apply_to_pixel,
+    }
+    .apply(&mut pixels);
 
     ctx.put_image_data(&pixels.into(), 0.0, 0.0).unwrap();
 }
