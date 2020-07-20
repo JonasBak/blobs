@@ -22,8 +22,8 @@ impl Filter for Kernel3x3 {
         for y in 1..pixels.h - 1 {
             for x in 1..pixels.w - 1 {
                 let mut acc = 0;
-                for i in -1..=1_i32 {
-                    for j in -1..=1_i32 {
+                for j in -1..=1_i32 {
+                    for i in -1..=1_i32 {
                         acc += (self[(j + 1) as usize][(i + 1) as usize] as i64)
                             * mapped[pixels
                                 .grid_to_index((x as i32 + i) as u32, (y as i32 + j) as u32)];
