@@ -29,22 +29,20 @@ pub fn apply_filter(ctx: &web_sys::CanvasRenderingContext2d) {
         .unwrap()
         .into();
 
-    Kernel3x3Filter {
-        k: LAPLACIAN2,
+    ConvolutionFilter {
+        k: &LOG,
         m: red_pixel_mapping,
         r: red_apply_to_pixel,
     }
     .apply(&mut pixels);
-
-    Kernel3x3Filter {
-        k: LAPLACIAN2,
+    ConvolutionFilter {
+        k: &LOG,
         m: green_pixel_mapping,
         r: green_apply_to_pixel,
     }
     .apply(&mut pixels);
-
-    Kernel3x3Filter {
-        k: LAPLACIAN2,
+    ConvolutionFilter {
+        k: &LOG,
         m: blue_pixel_mapping,
         r: blue_apply_to_pixel,
     }
