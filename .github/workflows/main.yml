@@ -5,31 +5,32 @@ on:
     branches: [master]
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
         with:
-          fetch-depth: 0
+          path: master
+      - uses: actions/checkout@v2
+        with:
+          path: gh-pages
+          ref: gh-pages
 
-      - name: Install deps
+      - name: Install deps and build
+        working-directory: "${{ github.workspace }}/master"
         run: |
           cargo install wasm-pack
           yarn
+          yarn build
 
-      - name: Build project
-        run: yarn build
-
-      - name: Commit to gh-pages
+      - name: Commit and push to gh-pages
+        working-directory: "${{ github.workspace }}/gh-pages"
         run: |
-          git checkout gh-pages
-          git ls-files | grep -v ".gitignore" | xargs rm
-          cp dist/* .
+          git ls-files | xargs rm
+          cp $GITHUB_WORKSPACE/master/dist/* .
           git config --global user.email "16608915+JonasBak@users.noreply.github.com"
           git config --global user.name "Actions"
           git add .
           git commit --allow-empty -m "Deploy ${GITHUB_SHA:0:7} to github pages"
-
-      - name: Push
-        run: git push
+          git push
