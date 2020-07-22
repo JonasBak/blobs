@@ -6,6 +6,7 @@ use pixel::*;
 
 use std::f64;
 use wasm_bindgen::prelude::*;
+use wasm_bindgen::JsValue;
 
 #[wasm_bindgen]
 extern "C" {
@@ -18,8 +19,32 @@ macro_rules! console_log {
     ($($t:tt)*) => (log(&format_args!($($t)*).to_string()))
 }
 
+const EDGE_DETECTION_GRAYSCALE: ConvolutionFilter = ConvolutionFilter {
+    k: &LOG_5x5,
+    m: mean_pixel_mapping,
+    r: equal_apply_to_pixel,
+};
+const GAUSSIAN_BLUR_GRAYSCALE: ConvolutionFilter = ConvolutionFilter {
+    k: &GAUSSIAN_5x5,
+    m: mean_pixel_mapping,
+    r: equal_apply_to_pixel,
+};
+
+const FILTERS: &[(&str, &dyn Filter)] = &[
+    ("Edge detection (grayscale)", &EDGE_DETECTION_GRAYSCALE),
+    ("Gaussian blur (grayscale)", &GAUSSIAN_BLUR_GRAYSCALE),
+];
+
 #[wasm_bindgen]
-pub fn apply_filter(ctx: &web_sys::CanvasRenderingContext2d) {
+pub fn get_filters() -> Vec<JsValue> {
+    FILTERS
+        .iter()
+        .map(|(name, _)| JsValue::from_str(name))
+        .collect()
+}
+
+#[wasm_bindgen]
+pub fn apply_filter(ctx: &web_sys::CanvasRenderingContext2d, filter: usize) {
     let (w, h) = {
         let canvas = ctx.canvas().unwrap();
         (canvas.width(), canvas.height())
@@ -29,24 +54,7 @@ pub fn apply_filter(ctx: &web_sys::CanvasRenderingContext2d) {
         .unwrap()
         .into();
 
-    ConvolutionFilter {
-        k: &LOG_5x5,
-        m: red_pixel_mapping,
-        r: red_apply_to_pixel,
-    }
-    .apply(&mut pixels);
-    ConvolutionFilter {
-        k: &LOG_5x5,
-        m: green_pixel_mapping,
-        r: green_apply_to_pixel,
-    }
-    .apply(&mut pixels);
-    ConvolutionFilter {
-        k: &LOG_5x5,
-        m: blue_pixel_mapping,
-        r: blue_apply_to_pixel,
-    }
-    .apply(&mut pixels);
+    FILTERS[filter].1.apply(&mut pixels);
 
     ctx.put_image_data(&pixels.into(), 0.0, 0.0).unwrap();
 }

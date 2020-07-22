@@ -1,48 +1,63 @@
+let selectedFilter = 0;
+let selectedInput = "image";
+
+const selectFilter = document.getElementById("selectFilter");
+selectFilter.addEventListener("change", (e) => {
+  const v = parseInt(e.target.value);
+  if (!isNaN(v)) {
+    selectedFilter = v;
+  }
+});
+
 const wasmPromise = import("../pkg");
 let wasm;
 wasmPromise.then((m) => {
   wasm = m;
+  m.get_filters().forEach((filter, i) => {
+    const node = document.createElement("option");
+    node.value = String(i);
+    node.innerText = filter;
+    selectFilter.appendChild(node);
+  });
+});
+
+const selectInput = document.getElementById("selectInput");
+selectInput.addEventListener("change", (e) => {
+  selectedInput = e.target.value;
 });
 
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
 const video = document.getElementById("webcamVideo");
-let renderVideo = false;
 
-import TestImage from "./testImage.jpg";
-const image = document.getElementById("testImage");
-image.src = TestImage;
+import testImageSrc from "./testImage.jpg";
+const testImage = document.getElementById("testImage");
+testImage.src = testImageSrc;
 const imagePromise = new Promise((resolve) =>
-  image.addEventListener("load", resolve)
+  testImage.addEventListener("load", resolve)
 );
 
-const setInputType = async (t) => {
-  renderVideo = false;
-  await wasmPromise;
-  if (t === "image") {
-    await imagePromise;
-    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-    wasm.apply_filter(ctx);
-  } else if (t === "webcam") {
-    if (!navigator.mediaDevices.getUserMedia) {
-      return;
+const render = async () => {
+  if (selectedInput === "image") {
+    ctx.drawImage(testImage, 0, 0, canvas.width, canvas.height);
+  } else if (selectedInput === "webcam") {
+    if (navigator.mediaDevices.getUserMedia && !video.srcObject) {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+      });
+      video.srcObject = stream;
     }
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: true,
-    });
-    video.srcObject = stream;
-    const renderWebcam = () => {
-      if (!renderVideo) return;
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      wasm.apply_filter(ctx);
-      requestAnimationFrame(renderWebcam);
-    };
-    renderVideo = true;
-    requestAnimationFrame(renderWebcam);
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
   }
+  wasm.apply_filter(ctx, selectedFilter);
+  requestAnimationFrame(render);
 };
 
-const selectInput = document.getElementById("selectInput");
-setInputType("image");
-selectInput.addEventListener("change", (e) => setInputType(e.target.value));
+const start = async () => {
+  await wasmPromise;
+  await imagePromise;
+  requestAnimationFrame(render);
+};
+
+start();

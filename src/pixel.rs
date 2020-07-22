@@ -2,6 +2,7 @@ use std::convert::TryInto;
 use wasm_bindgen::Clamped;
 
 pub type Pixel = [u8; 4];
+#[derive(Debug, Clone)]
 pub struct Pixels {
     pub v: Vec<Pixel>,
     pub w: u32,
