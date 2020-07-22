@@ -29,7 +29,7 @@ const setInputType = async (t) => {
       return;
     }
     const stream = await navigator.mediaDevices.getUserMedia({
-      video: { width: { exact: 640 }, height: { exact: 480 } },
+      video: true,
     });
     video.srcObject = stream;
     const renderWebcam = () => {

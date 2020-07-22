@@ -30,19 +30,19 @@ pub fn apply_filter(ctx: &web_sys::CanvasRenderingContext2d) {
         .into();
 
     ConvolutionFilter {
-        k: &LOG,
+        k: &LOG_5x5,
         m: red_pixel_mapping,
         r: red_apply_to_pixel,
     }
     .apply(&mut pixels);
     ConvolutionFilter {
-        k: &LOG,
+        k: &LOG_5x5,
         m: green_pixel_mapping,
         r: green_apply_to_pixel,
     }
     .apply(&mut pixels);
     ConvolutionFilter {
-        k: &LOG,
+        k: &LOG_5x5,
         m: blue_pixel_mapping,
         r: blue_apply_to_pixel,
     }
