@@ -17,10 +17,19 @@ jobs:
           path: gh-pages
           ref: gh-pages
 
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            ~/.cargo/bin/wasm-pack
+            master/target
+          key: ${{ runner.os }}-rust-${{ hashFiles('master/Cargo.lock') }}
+
       - name: Install deps and build
         working-directory: "${{ github.workspace }}/master"
         run: |
-          cargo install wasm-pack
+          test -f ~/.cargo/bin/wasm-pack || cargo install wasm-pack
           yarn
           yarn build
 
