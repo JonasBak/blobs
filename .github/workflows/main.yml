@@ -1,0 +1,35 @@
+name: Build and deploy
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Install deps
+        run: |
+          cargo install wasm-pack
+          yarn
+
+      - name: Build project
+        run: yarn build
+
+      - name: Commit to gh-pages
+        run: |
+          git checkout gh-pages
+          git ls-files | grep -v ".gitignore" | xargs rm
+          cp dist/* .
+          git config --global user.email "16608915+JonasBak@users.noreply.github.com"
+          git config --global user.name "Actions"
+          git add .
+          git commit -m "Deploy to github pages"
+
+      - name: Push
+        run: git push
