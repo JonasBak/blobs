@@ -5,11 +5,16 @@
     <title>Blob stuff</title>
   </head>
   <body>
-    <select id="selectInput">
-      <option selected="selected" value="image">Image</option>
-      <option value="webcam">Webcam</option>
-    </select>
-    <canvas id="canvas" width="640" height="480"> </canvas>
+    <div>
+      <canvas id="canvas" width="640" height="480"> </canvas>
+    </div>
+    <div>
+      <select id="selectInput">
+        <option selected="selected" value="image">Image</option>
+        <option value="webcam">Webcam</option>
+      </select>
+      <select id="selectFilter" value="0"></select>
+    </div>
     <div style="display: none;">
       <img id="testImage" width="320" height="240" />
       <video autoplay="true" id="webcamVideo"></video>
