@@ -29,9 +29,37 @@ const GAUSSIAN_BLUR_GRAYSCALE: ConvolutionFilter = ConvolutionFilter {
     m: mean_pixel_mapping,
     r: equal_apply_to_pixel,
 };
+const EDGE_DETECTION_RED: ConvolutionFilter = ConvolutionFilter {
+    k: &LOG_5x5,
+    m: red_pixel_mapping,
+    r: red_apply_to_pixel,
+};
+const EDGE_DETECTION_GREEN: ConvolutionFilter = ConvolutionFilter {
+    k: &LOG_5x5,
+    m: green_pixel_mapping,
+    r: green_apply_to_pixel,
+};
+const EDGE_DETECTION_BLUE: ConvolutionFilter = ConvolutionFilter {
+    k: &LOG_5x5,
+    m: blue_pixel_mapping,
+    r: blue_apply_to_pixel,
+};
+const EDGE_DETECTION_RGB: ChainFilter = ChainFilter(&[
+    &EDGE_DETECTION_RED,
+    &EDGE_DETECTION_GREEN,
+    &EDGE_DETECTION_BLUE,
+]);
 
 const FILTERS: &[(&str, &dyn Filter)] = &[
-    ("Edge detection (grayscale)", &EDGE_DETECTION_GRAYSCALE),
+    ("No filter", &NopFilter()),
+    (
+        "Edge detection, laplacean of gaussian (grayscale)",
+        &EDGE_DETECTION_GRAYSCALE,
+    ),
+    (
+        "Edge detection, laplacean of gaussian (rgb channels)",
+        &EDGE_DETECTION_RGB,
+    ),
     ("Gaussian blur (grayscale)", &GAUSSIAN_BLUR_GRAYSCALE),
 ];
 

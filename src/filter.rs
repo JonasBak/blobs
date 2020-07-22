@@ -67,6 +67,22 @@ impl Filter for ConvolutionFilter {
     }
 }
 
+pub struct NopFilter();
+
+impl Filter for NopFilter {
+    fn apply(&self, _: &mut Pixels) {}
+}
+
+pub struct ChainFilter(pub &'static [&'static dyn Filter]);
+
+impl Filter for ChainFilter {
+    fn apply(&self, pixels: &mut Pixels) {
+        for filter in self.0.iter() {
+            filter.apply(pixels);
+        }
+    }
+}
+
 pub const LAPLACIAN1: Kernel3x3 = [[0.0, -1.0, 0.0], [-1.0, 4.0, -1.0], [0.0, -1.0, 0.0]];
 pub const LAPLACIAN2: Kernel3x3 = [[-1.0, -1.0, -1.0], [-1.0, 8.0, -1.0], [-1.0, -1.0, -1.0]];
 
